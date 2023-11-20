@@ -23,7 +23,8 @@ function Landing() {
         fetch('http://localhost:3000/search', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'Target-URL': 'http://raln99'
             },
             body: JSON.stringify({query: searchText, useOrOperator: true})
         }).then(response => {
@@ -157,7 +158,12 @@ function BasicGrid(props: {results: Result[]}) {
       }, []);
 
     const handleRowClick = (params) => {
-        handleOpenFile(params.row.location)
+        let location = params.row.location
+        console.log(location)
+        location = location.slice(7)
+        location = '\\\\RALN99\\Vol3' + location
+        console.log(location)
+        handleOpenFile(location)
     }
 
     return (

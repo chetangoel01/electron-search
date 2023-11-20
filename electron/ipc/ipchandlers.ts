@@ -6,8 +6,10 @@ const {
 } = IPCACTIONS.File;
 
 const handleOpenFile = (event: IpcMainEvent, title: string) => {
+    console.log(title)
     // const filename = event?.sender;
     shell.openPath(title);
+    // shell.openPath('K:\\C&P-G\\GranTek Inc\\Green Bay WI\\00049\\Test Data\\Test Data-GranTek-000313.xls')
 }
 
 const ipcHandlers = [
