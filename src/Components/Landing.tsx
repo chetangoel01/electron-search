@@ -44,21 +44,14 @@ function Landing() {
         .catch(error => console.log(error))
     }
 
-    const handleFileTypeChange = (event, filetype: string) => {
-        const updatedFileTypes = new Set(filters.filetypes)
-        if (event.target.checked) {
-            updatedFileTypes.add(filetype)
-        }
-        else {
-            updatedFileTypes.delete(filetype)
-        }
-        setFilters({...filters, filetypes: filters.filetypes, checkedFileTypes: updatedFileTypes})
+    const handleFileTypeChange = (filetype: Set<string>) => {
+        setFilters({...filters, checkedFileTypes: filetype})
     }
 
     const filteredResults = results.filter((result) => {
-        if (filters.checkedFileTypes.size === 0) {
-        return true; // No filters selected, show all results
-        }
+        // if (filters.checkedFileTypes.size === 0) {
+        // return true; // No filters selected, show all results
+        // }
         return filters.checkedFileTypes.has(result.resultType);
     });   
 
@@ -66,7 +59,7 @@ function Landing() {
         <div>
             <Header />
             <div style={{display: 'flex'}}>
-                <div style={{width: '60%'}}>
+                <div style={{width: '60%', display: 'table'}}>
                     <TextField id="outlined-required" label="Search" variant="outlined" className='search-box'
                     style={{marginTop: '32px', marginLeft: '32px', height: '50px', width: '80%'}}
                     onChange={handleSearchChange}
@@ -180,20 +173,47 @@ function BasicGrid(props: {results: Result[]}) {
     )
 }
 
-function FilterCard(props: {filters: any, onFiletypeChange: (event: ChangeEvent<HTMLInputElement>, filetype: string) => void }) {
-    return <Card sx={{ minWidth: 275, marginTop: '32px', marginLeft: '32px'}}>
-    <CardContent>
-        filetype
-        {
-            props.filters.filetypes && Array.from(props.filters.filetypes).map((filetype) => (
-                <div>
-                    <FormControlLabel control={<Checkbox defaultChecked />} label={String(filetype)} 
-                    onChange={(event) => props.onFiletypeChange(event, filetype)}
-                    />
-                </div>
-            ))
+function FilterCard(props: {filters: any, onFiletypeChange: (event: ChangeEvent<HTMLInputElement>, filetype: Set<string>) => void }) {
+    const [selectedFiletypes, setSelectedFiletypes] = useState(new Set())
+    useEffect(() => {
+        if (props.filters.filetypes) {
+            setSelectedFiletypes(new Set(props.filters.filetypes));
+          }
+    }, [props.filters.filetypes])
+
+    const handleFileTypeChange = (event, filetype: string) => {
+        const updatedFileTypes = new Set(selectedFiletypes)
+        if (event.target.checked) {
+            updatedFileTypes.add(filetype)
         }
-    </CardContent>
+        else {
+            updatedFileTypes.delete(filetype)
+        }
+        setSelectedFiletypes(updatedFileTypes)
+    }
+
+    const handleFilterButtonClick = () => {
+        props.onFiletypeChange(selectedFiletypes);
+    }
+
+    return <Card sx={{ minWidth: 275, marginTop: '32px', marginLeft: '32px'}}>
+        <CardContent>
+            filetype
+            {
+                props.filters.filetypes && Array.from(props.filters.filetypes).map((filetype) => (
+                    <div>
+                        <FormControlLabel 
+                        control={<Checkbox checked={selectedFiletypes.has(filetype)} />}
+                        label={String(filetype)} 
+                        onChange={(event) => handleFileTypeChange(event, filetype)}
+                        />
+                    </div>
+                ))
+            }
+            <Button className='filter' variant='contained' onClick={handleFilterButtonClick}
+                style={{marginTop: '32px', marginLeft: '32px', backgroundColor: '#009B91', height: '56px'}}
+                >Filter</Button>
+        </CardContent>
   </Card>
 }
 
